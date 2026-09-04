@@ -1,5 +1,6 @@
 import { test, expect } from '../../fixtures/test.fixture';
 import { validatePlaywrightHomeResponse } from '../../api/schemas/validateResponse';
+import { expectStatus } from '../../api/schemas/assertions';
 
 test.describe('API Tests', () => {
 
@@ -28,7 +29,8 @@ test('POST create post should return valid post data', async ({ playwrightApi })
     userId: 1,
   };
   const response = await playwrightApi.createPost(postData);
-  expect(response.status).toBe(201);
+ //S expect(response.status).toBe(201);
+  expectStatus(response.status, 201);
   expect(response.post.id).toBeTruthy();
   expect(response.post.title).toBe(postData.title);
   expect(response.post.body).toBe(postData.body);
