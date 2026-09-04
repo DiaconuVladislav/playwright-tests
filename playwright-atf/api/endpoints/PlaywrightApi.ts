@@ -1,20 +1,39 @@
 import { ApiClient } from '../ApiClient';
-import { User } from '../schemas/UserSchema';
+import { User, UserSchema } from '../schemas/UserSchema';
+import { Post, PostSchema } from '../schemas/PostSchema';
+
 
 export class PlaywrightApi {
-  constructor(
-    private readonly apiClient: ApiClient
-  ) {}
+constructor(
+  private readonly apiClient: ApiClient,
+  private readonly jsonPlaceholderClient: ApiClient
+) {}
 
   async getHomePage() {
     return this.apiClient.get('/');
   }
 
-  async getUser(userId: number): Promise<User> {
-    const response = await this.apiClient.get(
-      `https://jsonplaceholder.typicode.com/users/${userId}`
-    );
+ async getUser(userId: number): Promise<User> {
+  const response = await this.jsonPlaceholderClient.get(
+    `/users/${userId}`
+  );
 
-    return response.json();
+  const data = await response.json();
+
+    return UserSchema.parse(data);
   }
+
+async createPost(data: {
+  title: string;
+  body: string;
+  userId: number;
+}): Promise<{ status: number; post: Post }> {
+  const response = await this.jsonPlaceholderClient.post('/posts', data);
+  const responseBody = await response.json();
+  const post = PostSchema.parse(responseBody);
+  return {
+    status: response.status(),
+    post,
+  };
+}
 }

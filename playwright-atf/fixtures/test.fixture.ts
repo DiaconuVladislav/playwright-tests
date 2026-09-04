@@ -7,6 +7,7 @@ import { environment } from '../config/environment';
 type TestFixtures = {
   homePage: PlaywrightHomePage;
   apiClient: ApiClient;
+  jsonPlaceholderClient: ApiClient;
   playwrightApi: PlaywrightApi;
 };
 
@@ -17,16 +18,29 @@ export const test = base.extend<TestFixtures>({
     await use(homePage);
   },
 
-  apiClient: async ({ request }, use) => {
-    const apiClient = new ApiClient(request, environment.apiBaseUrl);
-    await use(apiClient);
-  },
+apiClient: async ({ request }, use) => {
+  const apiClient = new ApiClient(request, environment.apiBaseUrl);
 
-  playwrightApi: async ({ apiClient }, use) => {
-    const playwrightApi = new PlaywrightApi(apiClient);
+  await use(apiClient);
+},
 
-    await use(playwrightApi);
-  },
+jsonPlaceholderClient: async ({ request }, use) => {
+  const jsonPlaceholderClient = new ApiClient(
+    request,
+    environment.jsonPlaceholderApiUrl
+  );
+
+  await use(jsonPlaceholderClient);
+},
+
+playwrightApi: async ({ apiClient, jsonPlaceholderClient }, use) => {
+  const playwrightApi = new PlaywrightApi(
+    apiClient,
+    jsonPlaceholderClient
+  );
+
+  await use(playwrightApi);
+},
 });
 
 export { expect } from '@playwright/test';
