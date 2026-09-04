@@ -28,5 +28,8 @@
     "@playwright/test": "^1.62.1",
     "@types/node": "^26.4.1",
     "typescript": "^5.9.0"
+  },
+  "dependencies": {
+    "zod": "^4.5.4"
   }
 }

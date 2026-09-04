@@ -7,9 +7,18 @@ test.describe('API Tests', () => {
 
     const response = await playwrightApi.getHomePage();
 
-    expect(response.ok()).toBeTruthy();
-    expect(response.status()).toBe(200);
     await validatePlaywrightHomeResponse(response);
+
+  });
+
+  test('GET user should return valid user data', async ({ playwrightApi }) => {
+
+    const user = await playwrightApi.getUser(1);
+
+    expect(user.id).toBe(1);
+    expect(user.name).toBeTruthy();
+    expect(user.username).toBeTruthy();
+    expect(user.email).toContain('@');
 
   });
 
