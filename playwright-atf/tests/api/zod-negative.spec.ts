@@ -1,22 +1,26 @@
-import { test, expect } from '@playwright/test';
-import { z } from 'zod';
+import { test, expect } from '../../fixtures/test.fixture';
+import { UserSchema } from '../../api/schemas/UserSchema';
 
-const UserSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  email: z.string().email()
-});
+test.describe('Zod Negative Tests', () => {
 
-test('Zod should reject invalid user data', async () => {
+  test('GET user should fail Zod validation with invalid data', async ({ playwrightApi }) => {
 
-  const invalidUser = {
-    id: 'WRONG',
-    name: 123,
-    email: 'not-an-email'
-  };
+    const response = await playwrightApi.getUserRaw(1);
 
-  const result = UserSchema.safeParse(invalidUser);
+    expect(response.status()).toBe(200);
 
-  expect(result.success).toBe(false);
+    const data = await response.json();
+
+    // Intentionally modify API response
+    const invalidUser = {
+      ...data,
+      id: 'WRONG'
+    };
+
+    const result = UserSchema.safeParse(invalidUser);
+
+    expect(result.success).toBe(false);
+
+  });
 
 });
