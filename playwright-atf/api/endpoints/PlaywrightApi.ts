@@ -22,6 +22,10 @@ constructor(
 
     return UserSchema.parse(data);
   }
+  
+  async getUserRaw(userId: number) {
+  return this.jsonPlaceholderClient.get(`/users/${userId}`);
+}
 
 async createPost(data: {
   title: string;

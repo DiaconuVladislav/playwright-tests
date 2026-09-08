@@ -21,6 +21,13 @@ test.describe('API Tests', () => {
 
   });
 
+  test('GET non-existing user should return 404', async ({ playwrightApi }) => {
+
+  const response = await playwrightApi.getUserRaw(99999);
+
+  expectStatus(response.status(), 404);
+});
+
 test('POST create post should return valid post data', async ({ playwrightApi }) => {
 
   const postData = {
