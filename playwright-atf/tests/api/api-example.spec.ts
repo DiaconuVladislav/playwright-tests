@@ -69,10 +69,18 @@ test.describe('API Tests', () => {
     test('GET posts should return valid post data', async ({ playwrightApi }) => {
       const posts = await playwrightApi.getPosts();
 
-      expect(posts[0].id).toBeTruthy();
-      expect(posts[0].userId).toBeTruthy();
-      expect(posts[0].title).toBeTruthy();
-      expect(posts[0].body).toBeTruthy();
+expect(posts.length).toBeGreaterThan(0);
+
+const firstPost = posts[0];
+
+if (!firstPost) {
+  throw new Error('Posts array is empty');
+}
+
+expect(firstPost.id).toBeTruthy();
+expect(firstPost.userId).toBeTruthy();
+expect(firstPost.title).toBeTruthy();
+expect(firstPost.body).toBeTruthy();
     });
 
   });

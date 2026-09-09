@@ -21,69 +21,85 @@ export class ApiClient {
     }
   }
 
-  async get(url: string) {
-    const fullUrl = this.buildUrl(url);
+  private async executeRequest(
+    method: string,
+    url: string,
+    request: () => Promise<APIResponse>
+  ): Promise<APIResponse> {
+    try {
+      Logger.info(`${method} ${url}`);
 
-    Logger.info(`GET ${fullUrl}`);
+      const response = await request();
 
-    const response = await this.request.get(fullUrl);
+      this.logResponse(response);
 
-    this.logResponse(response);
+      return response;
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : String(error);
 
-    return response;
+      Logger.error(`${method} ${url} failed: ${message}`);
+
+      throw error;
+    }
   }
 
-  async post(url: string, data?: unknown) {
+  async get(url: string): Promise<APIResponse> {
     const fullUrl = this.buildUrl(url);
 
-    Logger.info(`POST ${fullUrl}`);
-
-    const response = await this.request.post(fullUrl, {
-      data,
-    });
-
-    this.logResponse(response);
-
-    return response;
+    return this.executeRequest(
+      'GET',
+      fullUrl,
+      () => this.request.get(fullUrl)
+    );
   }
 
-async put(url: string, data?: unknown) {
-  const fullUrl = this.buildUrl(url);
+  async post(url: string, data?: unknown): Promise<APIResponse> {
+    const fullUrl = this.buildUrl(url);
 
-  Logger.info(`PUT ${fullUrl}`);
+    return this.executeRequest(
+      'POST',
+      fullUrl,
+      () =>
+        this.request.post(fullUrl, {
+          data,
+        })
+    );
+  }
 
-  const response = await this.request.put(fullUrl, {
-    data,
-  });
+  async put(url: string, data?: unknown): Promise<APIResponse> {
+    const fullUrl = this.buildUrl(url);
 
-  this.logResponse(response);
+    return this.executeRequest(
+      'PUT',
+      fullUrl,
+      () =>
+        this.request.put(fullUrl, {
+          data,
+        })
+    );
+  }
 
-  return response;
-}
+  async patch(url: string, data?: unknown): Promise<APIResponse> {
+    const fullUrl = this.buildUrl(url);
 
-async patch(url: string, data?: unknown) {
-  const fullUrl = this.buildUrl(url);
+    return this.executeRequest(
+      'PATCH',
+      fullUrl,
+      () =>
+        this.request.patch(fullUrl, {
+          data,
+        })
+    );
+  }
 
-  Logger.info(`PATCH ${fullUrl}`);
+  async delete(url: string): Promise<APIResponse> {
+    const fullUrl = this.buildUrl(url);
 
-  const response = await this.request.patch(fullUrl, {
-    data,
-  });
-
-  this.logResponse(response);
-
-  return response;
-}
-
-async delete(url: string) {
-  const fullUrl = this.buildUrl(url);
-
-  Logger.info(`DELETE ${fullUrl}`);
-
-  const response = await this.request.delete(fullUrl);
-
-  this.logResponse(response);
-
-  return response;
-}
+    return this.executeRequest(
+      'DELETE',
+      fullUrl,
+      () => this.request.delete(fullUrl)
+    );
+  }
 }

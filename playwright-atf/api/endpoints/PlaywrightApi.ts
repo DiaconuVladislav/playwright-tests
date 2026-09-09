@@ -1,37 +1,41 @@
+import { BaseApi } from '../base/BaseApi';
 import { ApiClient } from '../ApiClient';
+import { ResponseValidator } from '../validators/ResponseValidator';
 import { User, UserSchema } from '../schemas/UserSchema';
 import { Post, PostSchema } from '../schemas/PostSchema';
 
-export class PlaywrightApi {
+export class PlaywrightApi extends BaseApi {
   constructor(
-    private readonly apiClient: ApiClient,
-    private readonly jsonPlaceholderClient: ApiClient
-  ) {}
+    apiClient: ApiClient,
+    jsonPlaceholderClient: ApiClient
+  ) {
+    super(jsonPlaceholderClient);
+  }
 
   async getHomePage() {
     return this.apiClient.get('/');
   }
 
   async getUser(userId: number): Promise<User> {
-    const response = await this.jsonPlaceholderClient.get(
-      `/users/${userId}`
+    const response = await this.get(`/users/${userId}`);
+
+    return ResponseValidator.validate(
+      response,
+      UserSchema
     );
-
-    const data = await response.json();
-
-    return UserSchema.parse(data);
   }
 
   async getUserRaw(userId: number) {
-    return this.jsonPlaceholderClient.get(`/users/${userId}`);
+    return this.get(`/users/${userId}`);
   }
 
   async getPosts(): Promise<Post[]> {
-    const response = await this.jsonPlaceholderClient.get('/posts');
+    const response = await this.get('/posts');
 
-    const responseBody = await response.json();
-
-    return PostSchema.array().parse(responseBody);
+    return ResponseValidator.validate(
+      response,
+      PostSchema.array()
+    );
   }
 
   async createPost(data: {
@@ -39,10 +43,12 @@ export class PlaywrightApi {
     body: string;
     userId: number;
   }): Promise<{ status: number; post: Post }> {
-    const response = await this.jsonPlaceholderClient.post('/posts', data);
+    const response = await this.post('/posts', data);
 
-    const responseBody = await response.json();
-    const post = PostSchema.parse(responseBody);
+    const post = await ResponseValidator.validate(
+      response,
+      PostSchema
+    );
 
     return {
       status: response.status(),
@@ -58,13 +64,15 @@ export class PlaywrightApi {
       userId: number;
     }
   ): Promise<{ status: number; post: Post }> {
-    const response = await this.jsonPlaceholderClient.put(
+    const response = await this.put(
       `/posts/${postId}`,
       data
     );
 
-    const responseBody = await response.json();
-    const post = PostSchema.parse(responseBody);
+    const post = await ResponseValidator.validate(
+      response,
+      PostSchema
+    );
 
     return {
       status: response.status(),
@@ -80,13 +88,15 @@ export class PlaywrightApi {
       userId: number;
     }>
   ): Promise<{ status: number; post: Post }> {
-    const response = await this.jsonPlaceholderClient.patch(
+    const response = await this.patch(
       `/posts/${postId}`,
       data
     );
 
-    const responseBody = await response.json();
-    const post = PostSchema.parse(responseBody);
+    const post = await ResponseValidator.validate(
+      response,
+      PostSchema
+    );
 
     return {
       status: response.status(),
@@ -95,7 +105,7 @@ export class PlaywrightApi {
   }
 
   async deletePost(postId: number): Promise<number> {
-    const response = await this.jsonPlaceholderClient.delete(
+    const response = await this.delete(
       `/posts/${postId}`
     );
 
