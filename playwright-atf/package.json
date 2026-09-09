@@ -4,16 +4,13 @@
   "description": "Playwright TypeScript Automation Test Framework",
   "main": "index.js",
   "scripts": {
-    "test": "playwright test",
-    "test:headed": "playwright test --headed",
-    "test:debug": "playwright test --debug",
-    "test:ui": "playwright test --ui",
-    "test:smoke": "playwright test tests/smoke",
-    "test:regression": "playwright test tests/regression",
-    "test:e2e": "playwright test tests/e2e",
-    "report": "playwright show-report",
-    "type-check": "tsc --noEmit"
-  },
+  "test": "playwright test",
+  "test:api": "playwright test tests/api",
+  "test:chromium": "playwright test --project=chromium",
+  "test:firefox": "playwright test --project=firefox",
+  "test:webkit": "playwright test --project=webkit",
+  "report": "playwright show-report ./reports/html"
+},
   "keywords": [
     "playwright",
     "typescript",
